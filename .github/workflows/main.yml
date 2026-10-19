@@ -19,10 +19,10 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential ccache git libtool autoconf automake gettext ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixin-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
-        pip install --upgrade pip
-        pip install cython==0.29.36 buildozer python-for-android
+        sudo apt-get update || true
+        sudo apt-get install -y --no-install-recommends build-essential ccache git libtool autoconf automake gettext ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixin-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good zip unzip openjdk-17-jdk
+        pip install --upgrade pip setuptools
+        pip install "cython<3.0.0" buildozer python-for-android
 
     - name: Create buildozer.spec
       run: |
@@ -31,7 +31,7 @@ jobs:
         sed -i 's/package.name = myapp/package.name = jesusprayer/g' buildozer.spec
         sed -i 's/title = My Application/title = Jesus Prayer App/g' buildozer.spec
 
-    - name: Build APK and AAB
+    - name: Build APK
       run: |
         buildozer -v android debug
 
