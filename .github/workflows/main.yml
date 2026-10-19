@@ -1,0 +1,42 @@
+name: Build Android App
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential ccache git libtool autoconf automake gettext ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixin-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+        pip install --upgrade pip
+        pip install cython==0.29.36 buildozer python-for-android
+
+    - name: Create buildozer.spec
+      run: |
+        buildozer init
+        sed -i 's/#requirements = python3,kivy/requirements = python3,kivy,pillow/g' buildozer.spec
+        sed -i 's/package.name = myapp/package.name = jesusprayer/g' buildozer.spec
+        sed -i 's/title = My Application/title = Jesus Prayer App/g' buildozer.spec
+
+    - name: Build APK and AAB
+      run: |
+        buildozer -v android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: JesusPrayer-APK
+        path: bin/*.apk
